@@ -1,3 +1,5 @@
+#include "mbed.h"
+#include "WIZnetInterface.h"
 /**----------------------------------------------------------------------------
  * @target      Nucleo F411RE
  * @libraries   mbed drivers and rtos
@@ -11,21 +13,32 @@
  * your board check the readme file for more information.
  * By default printf and scanf with floating point number are disable
 -----------------------------------------------------------------------------*/
-#include "mbed.h"
-
-DigitalOut myled(LED1);
-Serial device(PA_2, PA_3);// tx, rx
-
-int main()
-{
-    device.baud(9600);//init serial port
-
-    while(1)
+int main() {
+    Serial pc(USBTX, USBRX);
+    pc.printf("Starte ...\r\n");
+    SPI device(PA_7, PA_6, PA_5); // mosi, miso, sclk
+    uint8_t mac[] = {0x22, 0x27, 0xeb, 0x98, 0x1e, 0xc4};
+    DigitalOut cs(); // ssel
+    WIZnetInterface win(&device, PB_6, NC);
+    int stat = win.init(mac);
+    if (stat==0)
     {
-        myled = 1; // LED is ON
-        wait(0.2); // 200 ms
-        myled = 0; // LED is OFF
-        wait(1.0); // 1 sec
-        device.printf("Hola Amigos\r\n");
+        pc.printf("init OK!\r\n");
+    }else
+    {
+        pc.printf("init FAILD!\r\n");
     }
+    stat=win.connect();
+    if (stat==0)
+    {
+        pc.printf("Connect!\r\n");
+    }else
+    {
+        pc.printf("Not Connected!\r\n");
+    }
+    pc.printf("IP-Adresse: %s\r\n", win.getIPAddress());
+    pc.printf("MAC-Adresse: %s\r\n",win.getMACAddress());
+    pc.printf("Netzwerkmaske: %s\r\n",win.getNetworkMask());
+    pc.printf("Gateway: %s\r\n",win.getGateway());
+
 }
