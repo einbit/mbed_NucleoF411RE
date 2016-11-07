@@ -13,12 +13,15 @@
 -----------------------------------------------------------------------------*/
 #include "mbed.h"
 
+
+
 DigitalOut myled(LED1);
-Serial device(PA_2, PA_3);// tx, rx
+Serial pc(USBTX, USBRX);
 
 int main()
 {
-    device.baud(9600);//init serial port
+SPI device(PA_7, PA_6, PA_5);
+pc.printf("Starte ...\r\n");
 
     while(1)
     {
@@ -26,6 +29,12 @@ int main()
         wait(0.2); // 200 ms
         myled = 0; // LED is OFF
         wait(1.0); // 1 sec
-        device.printf("Hola Amigos\r\n");
+        //Thread::wait(10000);
+        struct tm *actt;
+                time_t actTime;
+                time(&actTime);
+               // pc.printf("%lld\n", (long long) actTime);
+
     }
 }
+
